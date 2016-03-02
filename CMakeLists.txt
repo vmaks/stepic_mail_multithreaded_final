@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 
 # Define project name as the folder name.
-project(final_epoll_http_parser)
+project(final)
 
 
 if (UNIX)
