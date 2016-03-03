@@ -74,6 +74,16 @@ void f(int fd) {
     printf("%s\n", token.c_str());
   }
 
+  std::size_t found = path.find('?');
+
+  if (found != std::string::npos) {
+      std::cout << found <<'\n';
+
+    path = path.substr (0,found);
+  }
+
+  std::cout << "path = " << path <<'\n';
+
 
   std::stringstream ss;
 
@@ -116,6 +126,9 @@ void f(int fd) {
     strncpy(Buffer, ss.str().c_str(), size);
   } else {
     ss << "HTTP/1.0 404 NOT FOUND";
+    ss << "\r\n";
+    ss << "Content-length: ";
+    ss << 0;
     ss << "\r\n";
     ss << "Content-Type: text/html";
     ss << "\r\n\r\n";
@@ -169,6 +182,7 @@ int main(int argc, char **argv) {
   printf("ip=%s; port=%d; directory=%s;\n",
          ip, port, DIRECTORY);
 
+  // For demon.
   pid_t pid;
 
   pid = fork();
@@ -196,6 +210,16 @@ int main(int argc, char **argv) {
   SockAddr.sin_family = AF_INET;
   SockAddr.sin_port = htons((uint16_t) port);
   SockAddr.sin_addr.s_addr = inet_addr(ip);
+
+  int enable = 1;
+  if (setsockopt(MasterSocket,
+                 SOL_SOCKET,
+                 SO_REUSEADDR,
+                 &enable,
+                 sizeof(int)) < 0) {
+    std::cout << strerror(errno) << std::endl;
+    return 1;
+  }
 
   bind(MasterSocket,
        (struct sockaddr *) &SockAddr,
